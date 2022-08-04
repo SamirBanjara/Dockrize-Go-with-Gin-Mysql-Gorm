@@ -20,3 +20,14 @@ func Connect() {
 	connection.AutoMigrate(&models.User{})
 	DB = connection
 }
+
+func ConnectLocal() {
+	connection, err := gorm.Open("mysql", "root:@tcp(localhost:3306)/task_db")
+
+	if err != nil {
+		fmt.Println(err)
+		panic("Failed to connect to database!!!")
+	}
+	connection.AutoMigrate(&models.User{})
+	DB = connection
+}

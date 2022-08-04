@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	database.Connect()
+	database.ConnectLocal()
 	app := gin.Default()
 	routes.SetUp(app)
 	app.Run()

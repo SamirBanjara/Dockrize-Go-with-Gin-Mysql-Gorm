@@ -7,9 +7,11 @@ import (
 )
 
 func SetUp(app *gin.Engine) {
-	app.GET("api/user/", controllers.FindUser)
-	app.GET("/api/users", controllers.FindUsers)
-	app.POST("/api/user/:id", controllers.UpdateUser)
-	app.GET("/api/user/:id", controllers.FindUser)
-	app.DELETE("/api/user/:id", controllers.UserDelete)
+
+	app.POST("/api/auth/get-nonce", controllers.GetNonce)
+	app.POST("/api/auth/login", controllers.SendSignature)
+	app.GET("/api/auth/employee-list", controllers.EmployeeList)
+	app.GET("/api/auth/user/{id}", controllers.EmployeeById)
+	app.POST("/api/auth/employee-update/", controllers.UpdateEmployee)
+	app.DELETE("/api/auth/employee/{id}", controllers.EmployeeDelete)
 }

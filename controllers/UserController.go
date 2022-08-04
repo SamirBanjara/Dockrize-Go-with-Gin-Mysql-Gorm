@@ -5,6 +5,8 @@ import (
 	"task/database"
 	"task/models"
 
+	"task/helpers"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,27 +32,71 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
 
+func GetNonce(c *gin.Context) {
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		panic(err)
+	}
+	if err := database.DB.Where("public_key = ?", user.PublicKey).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record no found!"})
+		GetUserNonce(user.PublicKey)
+		return
+	} else {
+		user.Nonce = helpers.GenerateRandomString(20)
+		// err = CreateUser(user)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"data": "Public key already registered!"})
+			return
+		}
+
+	}
+	c.JSON(http.StatusOK, gin.H{"data": user.Nonce})
+}
+
+func CreateUser(models.User) {
+	// please create new user
+}
+
+func SendSignature(c *gin.Context) {
+
+}
+
+func GetUserNonce(public_key string) {
+	var user models.User
+	result := database.DB.Select("nonce").Find(&user).Where("public_key =?", public_key)
+	if result != nil {
+		panic("err")
+	}
+}
+
+func EmployeeList(c *gin.Context) {
+	var users []models.User
+	database.DB.Where("role =?", "employee")
+	c.JSON(http.StatusOK, gin.H{"data": users})
+}
+
 func FindUsers(c *gin.Context) {
 	var users []models.User
 	database.DB.Find(&users)
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
 
-func FindUser(c *gin.Context) {
+func EmployeeById(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
 	if err := database.DB.Where("id = ?", id).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Record nottt found!"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record no found!"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func UpdateUser(c *gin.Context) {
-	var task models.User
+func UpdateEmployee(c *gin.Context) {
+	var user models.User
 	id := c.Param("id")
-	if err := database.DB.Where("id = ?", id).First(&task).Error; err != nil {
+	if err := database.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
@@ -61,12 +107,12 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	database.DB.Model(&task).Updates(input)
+	database.DB.Model(&user).Updates(input)
 
-	c.JSON(http.StatusOK, gin.H{"data": task})
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func UserDelete(c *gin.Context) {
+func EmployeeDelete(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
 	if err := database.DB.Where("id = ?", id).First(&user).Error; err != nil {
