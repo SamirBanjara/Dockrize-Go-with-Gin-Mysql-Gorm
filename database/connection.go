@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"task/models"
 
 	"github.com/jinzhu/gorm"
@@ -14,7 +13,6 @@ func Connect() {
 	connection, err := gorm.Open("mysql", "user:user@123@tcp(mysql:3306)/task_db")
 
 	if err != nil {
-		fmt.Println(err)
 		panic("Failed to connect to database!!!")
 	}
 	connection.AutoMigrate(&models.User{})
@@ -25,7 +23,6 @@ func ConnectLocal() {
 	connection, err := gorm.Open("mysql", "root:@tcp(localhost:3306)/task_db")
 
 	if err != nil {
-		fmt.Println(err)
 		panic("Failed to connect to database!!!")
 	}
 	connection.AutoMigrate(&models.User{})

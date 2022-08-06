@@ -18,16 +18,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type CreateRegisterInput struct {
-	Name      string `json:"name" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	PublicKey string `json:"pb"`
-	Nonce     string `json:"nonce"`
-}
 type UpdateUserInput struct {
-	Name          string `json:"name" binding:"required"`
-	Email         string `json:"email" binding:"required"`
-	Address       string `json:"address" binding:"required"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	Address       string `json:"address"`
 	PublicKey     string `json:"pb"`
 	Post          string `json:"post"`
 	Annual_Salary string `json:"annual_salary"`
@@ -35,32 +29,27 @@ type UpdateUserInput struct {
 
 const SecretKey = "secret"
 
-func Register(c *gin.Context) {
-	var input CreateRegisterInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+// Paths Information
 
-	task := models.User{Name: input.Name, Email: input.Email}
-	database.DB.Create(&task)
-
-	c.JSON(http.StatusOK, gin.H{"data": task})
-}
-
+// Login godoc
+// @Summary Provides a JSON Web Token
+// @Description Authenticates a user and provides a JWT to Authorize API calls
+// @ID Authentication
+// @Tags         Login
+// @Consume application/x-www-form-urlencoded
+// @Produce json
+// @Param public_key formData string true "PublicKey"
+// @Router /get-nonce [post]
 func GetNonce(c *gin.Context) {
 	var user models.User
 	if err := c.BindJSON(&user); err != nil {
-		panic(err)
+		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
 	if err := database.DB.Where("public_key = ?", user.PublicKey).First(&user).Error; err != nil {
 		user.Nonce = helpers.GenerateRandomString(20)
 		user = CreateUser(user)
-		// fmt.Println(userData)
-		fmt.Println(user.Nonce)
 		c.JSON(http.StatusOK, gin.H{"nonce": user.Nonce})
 	} else {
-		fmt.Println("existing user")
 		c.JSON(http.StatusOK, gin.H{"nonce": user.Nonce})
 	}
 }
@@ -74,27 +63,26 @@ func CreateUser(user models.User) models.User {
 func SendSignature(c *gin.Context) {
 	user := models.User{}
 	if err := c.BindJSON(&user); err != nil {
-		panic(err)
+		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
 	decodedSig, err := hexutil.Decode(user.Signature)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
 	if decodedSig[64] != 27 && decodedSig[64] != 28 {
 		return
 	}
 	decodedSig[64] -= 27
 	user_nonce := GetUserNonce(user.PublicKey)
-	// nonce := []byte(user.Nonce)
 	prefixedNonce := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(user_nonce), user_nonce)
 	hash := crypto.Keccak256Hash([]byte(prefixedNonce))
 	recoveredPublicKey, err := crypto.Ecrecover(hash.Bytes(), decodedSig)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
 	secp256k1RecoveredPublicKey, err := crypto.UnmarshalPubkey(recoveredPublicKey)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
 	recoveredAddress := crypto.PubkeyToAddress(*secp256k1RecoveredPublicKey).Hex()
 	isClientAddressEqualToRecoveredAddress := strings.ToLower(user.PublicKey) == strings.ToLower(recoveredAddress)
@@ -143,19 +131,20 @@ func GetUserNonce(public_key string) string {
 	return user.Nonce
 }
 
+// Employee List godoc
+// @Summary Provides a JSON Web Token
+// @Description Get Employees List
+// @Tags         Employee List
+// @Security bearerAuth
+// @Consume application/x-www-form-urlencoded
+// @Produce json
+// @Router /employee-list [get]
 func EmployeeList(c *gin.Context) {
 	var users []models.User
-	if err := database.DB.Where("role = ?", "employee").First(&users).Error; err != nil {
+	if err := database.DB.Where("role = ?", "employee").Find(&users).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record no found!"})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"data": users})
-}
-
-func FindUsers(c *gin.Context) {
-	var users []models.User
-	database.DB.Find(&users)
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
 
@@ -170,6 +159,15 @@ func EmployeeById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
+// Employee Update godoc
+// @Summary Provides a JSON Web Token
+// @Description Update Employee
+// @Tags         Update Employee
+// @Security bearerAuth
+// @Param employee body models.User true "Update Employee"
+// @Consume application/x-www-form-urlencoded
+// @Produce json
+// @Router /employee-update [post]
 func UpdateEmployee(c *gin.Context) {
 	var user models.User
 	var input UpdateUserInput
@@ -180,12 +178,19 @@ func UpdateEmployee(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
-	fmt.Println(input)
 	database.DB.Model(&user).Updates(input)
-
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
+// Employee Delete godoc
+// @Summary Provides a JSON Web Token
+// @Description Update Employee
+// @Tags         Delete Employee
+// @Security bearerAuth
+// @Param  id path int true "Employee ID"
+// @Consume application/x-www-form-urlencoded
+// @Produce json
+// @Router /employee/{id} [delete]
 func EmployeeDelete(c *gin.Context) {
 	var user models.User
 	id := c.Param("id")
@@ -200,4 +205,8 @@ func EmployeeDelete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": "Usre Deleted Successfully"})
+}
+
+func GetSwaggerTest(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"data": "test api"})
 }

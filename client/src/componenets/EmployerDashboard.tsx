@@ -47,10 +47,10 @@ const EmployerDashboard = (props:any) => {
       setEmployee(employees[key]);
     }
     return (
-      <div className="container mt-4">
+      <div className="container mt-4" style={{backgroundColor:'ghostwhite', borderRadius:35, boxShadow:"11px -6px 10px -11px"}}>
       <h1>Employer Dashboard</h1>
         <p>Public Id: {user && user.pb}</p>
-        <p>Token: {token && token}</p>
+        <p style={{color:"green"}}>Token: {token && token}</p>
         <p>Role: {user && user.role}</p>
         <hr/>
         <button type="button" className="btn btn-primary" onClick={handleLogout}>log out</button>
@@ -69,7 +69,7 @@ const EmployerDashboard = (props:any) => {
           <tbody>
             {employees && employees.map((emp:any, key:any) => (
               <tr key={key}>
-                <td>{key}</td>
+                <td>{key+1}</td>
                 <td>
                   {emp.name}
                   <p>{emp.pb}</p>
@@ -83,7 +83,8 @@ const EmployerDashboard = (props:any) => {
                   <button type="button" className="btn btn-primary" onClick={() => editEmployee(key)} data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Edit
                   </button>
-                  <button type="button" className="btn btn-danger" onClick={() => deleteThisEmployee(key)}>
+                  |
+                  <button type="button" className="btn btn-danger" onClick={() => deleteThisEmployee(emp.id)}>
                     Delete
                   </button>
 

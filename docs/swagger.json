@@ -1,0 +1,157 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {
+            "name": "API Support"
+        }
+    },
+    "paths": {
+        "/employee-list": {
+            "get": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Get Employees List",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee List"
+                ],
+                "summary": "Provides a JSON Web Token",
+                "responses": {}
+            }
+        },
+        "/employee-update": {
+            "post": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Update Employee",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Update Employee"
+                ],
+                "summary": "Provides a JSON Web Token",
+                "parameters": [
+                    {
+                        "description": "Update Employee",
+                        "name": "employee",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/employee/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Update Employee",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Delete Employee"
+                ],
+                "summary": "Provides a JSON Web Token",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Employee ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/get-nonce": {
+            "post": {
+                "description": "Authenticates a user and provides a JWT to Authorize API calls",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Provides a JSON Web Token",
+                "operationId": "Authentication",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "PublicKey",
+                        "name": "public_key",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "annual_salary": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nonce": {
+                    "type": "string"
+                },
+                "pb": {
+                    "type": "string"
+                },
+                "post": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "sig": {
+                    "type": "string"
+                },
+                "ssn": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "token": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

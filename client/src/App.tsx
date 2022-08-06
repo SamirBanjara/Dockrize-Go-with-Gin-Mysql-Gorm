@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Web3 from 'web3'
-import { getNonce, postSignature, register as apiRegister } from "./api/api";
+import { getNonce, postSignature} from "./api/api";
 import Auth from "./Auth";
 import EmployeeDashboard from "./componenets/EmployeeDashboard";
 import EmployerDashboard from "./componenets/EmployerDashboard";
@@ -79,6 +79,7 @@ const App: React.FC = () => {
     );
 
     window.sessionStorage.setItem("token", access_token);
+    checkLogin()
   }
 
   const handleLogout = async () => {

@@ -1,0 +1,100 @@
+definitions:
+  models.User:
+    properties:
+      address:
+        type: string
+      annual_salary:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      nonce:
+        type: string
+      pb:
+        type: string
+      post:
+        type: string
+      role:
+        type: string
+      sex:
+        type: string
+      sig:
+        type: string
+      ssn:
+        type: string
+    type: object
+info:
+  contact:
+    name: API Support
+paths:
+  /employee-list:
+    get:
+      description: Get Employees List
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - bearerAuth: []
+      summary: Provides a JSON Web Token
+      tags:
+      - Employee List
+  /employee-update:
+    post:
+      description: Update Employee
+      parameters:
+      - description: Update Employee
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - bearerAuth: []
+      summary: Provides a JSON Web Token
+      tags:
+      - Update Employee
+  /employee/{id}:
+    delete:
+      description: Update Employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - bearerAuth: []
+      summary: Provides a JSON Web Token
+      tags:
+      - Delete Employee
+  /get-nonce:
+    post:
+      description: Authenticates a user and provides a JWT to Authorize API calls
+      operationId: Authentication
+      parameters:
+      - description: PublicKey
+        in: formData
+        name: public_key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Provides a JSON Web Token
+      tags:
+      - Login
+securityDefinitions:
+  token:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

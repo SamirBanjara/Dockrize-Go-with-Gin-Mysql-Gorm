@@ -1,12 +1,11 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api/";
-const LOGIN_ENDPOINT = "auth/login";
-const NONCE_ENDPOINT = "auth/get-nonce";
-const REGISTER_ENDPOINT = "auth/register";
-const EMPLOYEE_LIST_ENDPOINT = "auth/employee-list";
-const EMPLOYEE_ENDPOINT = "auth/user/";
-const EMPLOYEE_UPDATE_ENDPOINT = "auth/employee-update/";
+const BASE_URL = "http://localhost:8080/api/auth";
+const LOGIN_ENDPOINT = "/login";
+const NONCE_ENDPOINT = "/get-nonce";
+const EMPLOYEE_LIST_ENDPOINT = "/employee-list";
+const EMPLOYEE_ENDPOINT = "/employee/";
+const EMPLOYEE_UPDATE_ENDPOINT = "/employee-update";
 
 
 
@@ -35,10 +34,7 @@ const client = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    // "Access-Control-Allow-Origin": "*",
-    // "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers",
-    // 'Content-Type': 'text/plain; charset=utf-8',
-    'authorization': token,
+    'Authorization': token,
   },
 });
 
@@ -47,8 +43,11 @@ export const getNonce = async (data: NonceEndpoint) => {
   return resp;
 };
 
+
 export const getEmployeeList = async () => {
-  const resp = await client.get(EMPLOYEE_LIST_ENDPOINT);
+  const resp = await client.get(EMPLOYEE_LIST_ENDPOINT, {
+    headers: { Authorization: token },
+  });
   return resp;
 };
 
@@ -70,10 +69,5 @@ export const updateEmployee = async (data: any) => {
 
 export const postSignature = async (data: SignatureEndpoint) => {
   const resp = await client.post(LOGIN_ENDPOINT, data);
-  return resp;
-};
-
-export const register = async (data: RegisterEndpoint) => {
-  const resp = await client.post(REGISTER_ENDPOINT, data);
   return resp;
 };

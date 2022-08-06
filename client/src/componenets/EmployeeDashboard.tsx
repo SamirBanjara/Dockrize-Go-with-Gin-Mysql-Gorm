@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { getEmployeeById, updateEmployee } from "../api/api";
 
 let initial = {
@@ -24,22 +24,21 @@ const EmployeeDashboard = (props:any) => {
       async function updateThisEmployee(){
         await updateEmployee(employee)
         let res = await getEmployeeById(employee.id)
-        console.log("=======", res.data.data);
         setEmployee(res.data.data)
         let user = res.data.data
         window.sessionStorage.setItem(
           "user",
-          user
+          JSON.stringify(user)
         );
     
       }
     return (
-      <div className="container">
+      <div className="container" style={{backgroundColor:'ghostwhite', borderRadius:35, boxShadow:"11px -6px 10px -11px"}}>
       <h1>Employee Dashboard</h1>
       {employee && (
           <>
            <p>Public Id: {employee && employee.pb}</p>
-        <p>Token: {token && token}</p>
+        <p style={{color:"green"}}>Token: {token && token}</p>
         <p>Role: {employee && employee.role}</p>
         <p>Post: {employee && employee.post}</p>
         <div className="container">
@@ -54,8 +53,8 @@ const EmployeeDashboard = (props:any) => {
             <input type="text" name="address" className="form-control" value={employee.address} onChange={handleChange}/>
             </div>
         </div>
+        <hr/>
             <button type="button" onClick={updateThisEmployee} className="btn btn-primary">Save changesss</button>
-       
         <hr/>
         <button type="button" className="btn btn-secondary" onClick={handleLogout}>log out</button>
           </>
