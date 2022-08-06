@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getEmployeeList, updateEmployee } from "../api/api";
+import { getEmployeeList, updateEmployee, deleteEmployee } from "../api/api";
 
 let initial = {
   id: '',
@@ -22,7 +22,7 @@ const EmployerDashboard = (props:any) => {
     async function getEmployees() {
       
       let res = await getEmployeeList()
-      setEmployees(res.data)
+      setEmployees(res.data.data)
     }
 
     function handleChange(e:any){
@@ -31,6 +31,11 @@ const EmployerDashboard = (props:any) => {
           ...emp,
           [e.target.name]: e.target.value
         }))
+    }
+
+   async function deleteThisEmployee(id: number) {
+        await deleteEmployee(id)
+        getEmployees()
     }
 
     async function updateThisEmployee(){
@@ -77,6 +82,9 @@ const EmployerDashboard = (props:any) => {
         
                   <button type="button" className="btn btn-primary" onClick={() => editEmployee(key)} data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Edit
+                  </button>
+                  <button type="button" className="btn btn-danger" onClick={() => deleteThisEmployee(key)}>
+                    Delete
                   </button>
 
                   <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">

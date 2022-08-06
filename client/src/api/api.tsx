@@ -34,9 +34,11 @@ let token = window.sessionStorage.getItem("token");
 const client = axios.create({
   baseURL: BASE_URL,
   headers: {
-    // "Content-Type": "application/json",
-    'Content-Type': 'text/plain; charset=utf-8',
-    // 'authorization': token,
+    "Content-Type": "application/json",
+    // "Access-Control-Allow-Origin": "*",
+    // "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers",
+    // 'Content-Type': 'text/plain; charset=utf-8',
+    'authorization': token,
   },
 });
 
@@ -52,6 +54,11 @@ export const getEmployeeList = async () => {
 
 export const getEmployeeById = async (id: any) => {
   const resp = await client.get(EMPLOYEE_ENDPOINT+id);
+  return resp;
+};
+
+export const deleteEmployee = async (id: any) => {
+  const resp = await client.delete(EMPLOYEE_ENDPOINT+id);
   return resp;
 };
 

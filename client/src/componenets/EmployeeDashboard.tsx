@@ -24,7 +24,14 @@ const EmployeeDashboard = (props:any) => {
       async function updateThisEmployee(){
         await updateEmployee(employee)
         let res = await getEmployeeById(employee.id)
-        setEmployee(res.data)
+        console.log("=======", res.data.data);
+        setEmployee(res.data.data)
+        let user = res.data.data
+        window.sessionStorage.setItem(
+          "user",
+          user
+        );
+    
       }
     return (
       <div className="container">

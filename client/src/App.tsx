@@ -64,18 +64,18 @@ const App: React.FC = () => {
       sig: userSignature
     }
     const isAuthResp = await postSignature(data)
-   
     let access_token = "";
     if (userSignature) {
-      access_token = "token " + isAuthResp.data.token;
+      access_token = "token " + isAuthResp.data.data.token;
     }
-    setIsAuthenticated(isAuthResp.data.authenticated)
+    let user = isAuthResp.data.data.user
+    setIsAuthenticated(isAuthResp.data.data.authenticated)
     setAuthToken(access_token)
-    setUser({...JSON.parse(isAuthResp.data.user)})
+    setUser({...user})
 
     window.sessionStorage.setItem(
       "user",
-      isAuthResp.data.user
+      user
     );
 
     window.sessionStorage.setItem("token", access_token);
