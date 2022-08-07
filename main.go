@@ -29,7 +29,7 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api/auth"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	database.ConnectLocal()
+	database.Connect()
 	app := gin.Default()
 	app.Use(cors.Middleware(cors.Config{
 		Origins:         "*",
