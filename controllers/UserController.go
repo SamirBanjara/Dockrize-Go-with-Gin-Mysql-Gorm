@@ -55,9 +55,9 @@ func GetNonce(c *gin.Context) {
 }
 
 func CreateUser(user models.User) models.User {
-	task := models.User{PublicKey: user.PublicKey, Nonce: user.Nonce, Role: user.Role}
-	database.DB.Create(&task)
-	return task
+	db_user := models.User{PublicKey: user.PublicKey, Nonce: user.Nonce, Role: user.Role}
+	database.DB.Create(&db_user)
+	return db_user
 }
 
 func SendSignature(c *gin.Context) {
@@ -65,6 +65,7 @@ func SendSignature(c *gin.Context) {
 	if err := c.BindJSON(&user); err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": err})
 	}
+
 	decodedSig, err := hexutil.Decode(user.Signature)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": err})
@@ -88,7 +89,7 @@ func SendSignature(c *gin.Context) {
 	isClientAddressEqualToRecoveredAddress := strings.ToLower(user.PublicKey) == strings.ToLower(recoveredAddress)
 	if isClientAddressEqualToRecoveredAddress {
 		user.Nonce = helpers.GenerateRandomString(20)
-		UpdateNonce(user.PublicKey)
+		UpdateNonce(user.PublicKey, user.Nonce)
 	}
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    strconv.Itoa(int(user.ID)),
@@ -115,11 +116,13 @@ func GetUserByPublicKey(public_key string) models.User {
 	return user
 }
 
-func UpdateNonce(public_key string) error {
+func UpdateNonce(public_key string, nonce string) error {
 	user := models.User{}
 	if err := database.DB.Where("public_key = ?", public_key).First(&user).Error; err != nil {
 		panic("Record not found!")
 	}
+	user.Nonce = nonce
+	database.DB.Model(&user).Updates(user)
 	return nil
 }
 
@@ -205,8 +208,4 @@ func EmployeeDelete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": "Usre Deleted Successfully"})
-}
-
-func GetSwaggerTest(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"data": "test api"})
 }

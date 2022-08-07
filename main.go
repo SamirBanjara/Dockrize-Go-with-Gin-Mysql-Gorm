@@ -29,7 +29,7 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api/auth"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	database.Connect()
+	database.ConnectLocal()
 	app := gin.Default()
 	app.Use(cors.Middleware(cors.Config{
 		Origins:         "*",
@@ -42,6 +42,6 @@ func main() {
 	}))
 	routes.SetUp(app)
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	app.Run()
+	app.Run("localhost:8080")
 
 }
